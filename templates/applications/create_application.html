@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Новая заявка{% endblock %}
+
+{% block content %}
+<h1>Создание заявки на обучение</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    
+    <div class="form-group">
+        <label for="{{ form.course_name.id_for_label }}">Наименование курса</label>
+        {{ form.course_name }}
+        {% if form.course_name.errors %}
+            <div class="errorlist">{{ form.course_name.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="{{ form.desired_start_date.id_for_label }}">Желаемая дата начала</label>
+        <input type="text" name="desired_start_date" id="id_desired_start_date" placeholder="ДД.ММ.ГГГГ" required>
+        <small style="color: #666; display: block; margin-top: 5px;">Формат: ДД.ММ.ГГГГ (например, 31.12.2025)</small>
+        {% if form.desired_start_date.errors %}
+            <div class="errorlist">{{ form.desired_start_date.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Способ оплаты</label>
+        <div style="display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;">
+            {% for radio in form.payment_method %}
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+            {% endfor %}
+        </div>
+        {% if form.payment_method.errors %}
+            <div class="errorlist">{{ form.payment_method.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit">Отправить заявку</button>
+</form>
+
+<p style="margin-top: 20px;">
+    <a href="{% url 'applications_list' %}">Назад к моим заявкам</a>
+</p>
+
+<script>
+    const dateInput = document.getElementById('id_desired_start_date');
+    if (dateInput) {
+        const form = dateInput.closest('form');
+        form.addEventListener('submit', function(e) {
+            let val = dateInput.value;
+            if (val && val.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+                let parts = val.split('.');
+                dateInput.value = parts[2] + '-' + parts[1] + '-' + parts[0];
+            }
+        });
+    }
+</script>
+{% endblock %}

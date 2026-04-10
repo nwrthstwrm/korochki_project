@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои заявки{% endblock %}
+
+{% block content %}
+<h1>Мои заявки на обучение</h1>
+
+{% if applications %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Курс</th>
+                    <th>Дата начала</th>
+                    <th>Способ оплаты</th>
+                    <th>Статус</th>
+                    <th>Дата создания</th>
+                    <th>Отзыв</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ application.course_name }}</strong></td>
+                        <td>{{ application.desired_start_date|date:"d.m.Y" }}</td>
+                        <td>
+                            {% if application.payment_method == 'cash' %}
+                                Наличными
+                            {% else %}
+                                Перевод по номеру телефона
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if application.status.name == 'Новая' %}
+                                <span class="status-new">{{ application.status.name }}</span>
+                            {% elif application.status.name == 'Идет обучение' %}
+                                <span class="status-in-progress">{{ application.status.name }}</span>
+                            {% else %}
+                                <span class="status-completed">{{ application.status.name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ application.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if application.status.name == 'Обучение завершено' %}
+                                {% if application.review %}
+                                    <div class="review-card">
+                                        <strong>Ваш отзыв:</strong>
+                                        <p style="margin: 8px 0 0 0;">{{ application.review.text }}</p>
+                                        <small style="color: #666;">{{ application.review.created_at|date:"d.m.Y" }}</small>
+                                    </div>
+                                {% else %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="application_id" value="{{ application.id }}">
+                                        <textarea name="review_text" rows="3" placeholder="Оставьте ваш отзыв о качестве образовательных услуг..."></textarea>
+                                        <button type="submit" class="btn-sm" style="background: #28a745; margin-top: 8px;">Оставить отзыв</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <em style="color: #999;">Отзыв доступен после завершения обучения</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 60px 20px;">
+        <p style="font-size: 1.2rem; color: #666;">У вас пока нет заявок</p>
+        <p style="margin-top: 20px;">
+            <a href="{% url 'create_application' %}" style="background-color:#667eea; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block;">Создать первую заявку</a>
+        </p>
+    </div>
+{% endif %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'create_application' %}" style="background-color:#667eea; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block;">Новая заявка</a>
+</div>
+{% endblock %}

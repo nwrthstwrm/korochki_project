@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 40px 20px;">
+    <h1>Добро пожаловать на портал «Корочки.есть»!</h1>
+    
+    <p style="font-size: 1.2rem; color: #666; margin: 20px 0;">
+        Информационная система для записи на онлайн-курсы<br>
+        дополнительного профессионального образования
+    </p>
+    
+    {% if not user.is_authenticated %}
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+            <a href="{% url 'register' %}" style="background-color: #667eea; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none;">Зарегистрироваться</a>
+            <a href="{% url 'login' %}" style="background: #28a745; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none;">Войти</a>
+        </div>
+    {% else %}
+        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+            <a href="{% url 'applications_list' %}" style="background-color: #667eea; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none;">Мои заявки</a>
+            <a href="{% url 'create_application' %}" style="background: #28a745; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none;">Новая заявка</a>
+        </div>
+    {% endif %}
+</div>
+
+ <div class="slider-container">
+    <div class="slider" id="slider">
+        <div class="slide">
+            <img src="/static/images/slide1.jpg" alt="Профессиональное образование">
+            <div class="slide-caption">
+                <h3>Профессиональное образование</h3>
+                <p>Курсы от ведущих экспертов</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/static/images/slide2.jpg" alt="Доступные цены">
+            <div class="slide-caption">
+                <h3>Доступные цены</h3>
+                <p>Качественное образование для всех</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/static/images/slide3.jpg" alt="Официальные документы">
+            <div class="slide-caption">
+                <h3>Официальные документы</h3>
+                <p>Дипломы и удостоверения</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/static/images/slide4.jpg" alt="Круглосуточная поддержка">
+            <div class="slide-caption">
+                <h3>Поддержка 24/7</h3>
+                <p>Помощь в любое время</p>
+            </div>
+        </div>
+        </div>
+            <button class="slider-btn prev" id="prevBtn">❮</button>
+            <button class="slider-btn next" id="nextBtn">❯</button>
+        <div class="slider-dots" id="dots"></div>
+</div>
+
+<div style="margin-top: 40px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 16px; width: 250px; text-align: center;">
+        <h3>Качественное образование</h3>
+        <p>Курсы от профессионалов</p>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 16px; width: 250px; text-align: center;">
+        <h3>Официальные документы</h3>
+        <p>Удостоверения и дипломы</p>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 16px; width: 250px; text-align: center;">
+        <h3>Онлайн формат</h3>
+        <p>Учись из любой точки мира</p>
+    </div>
+</div>
+{% endblock %}

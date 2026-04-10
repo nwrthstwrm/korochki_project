@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель администратора{% endblock %}
+
+{% block content %}
+<h1>Панель администратора</h1>
+<p style="color: #666; margin-bottom: 20px;">Управление всеми заявками пользователей</p>
+
+<!-- Простые фильтры -->
+<div class="filters">
+    <div class="filter-group">
+        <label>Фильтр по статусу</label>
+        <form method="get" style="display: flex; gap: 10px;">
+            <select name="status" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                <option value="all" {% if request.GET.status == 'all' or not request.GET.status %}selected{% endif %}>Все</option>
+                <option value="Новая" {% if request.GET.status == 'Новая' %}selected{% endif %}>Новая</option>
+                <option value="Идет обучение" {% if request.GET.status == 'Идет обучение' %}selected{% endif %}>Идет обучение</option>
+                <option value="Обучение завершено" {% if request.GET.status == 'Обучение завершено' %}selected{% endif %}>Обучение завершено</option>
+            </select>
+            <button type="submit" style="background: #667eea; padding: 8px 16px;">Применить</button>
+            <a href="{% url 'admin_panel' %}" style="background: #6c757d; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Сбросить</a>
+        </form>
+    </div>
+</div>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Пользователь</th>
+                <th>Курс</th>
+                <th>Дата начала</th>
+                <th>Способ оплаты</th>
+                <th>Статус</th>
+                <th>Изменить статус</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>#{{ application.id }}</td>
+                <td>
+                    <strong>{{ application.user.full_name|default:application.user.username }}</strong><br>
+                    <small style="color: #666;">{{ application.user.email }}</small>
+                </td>
+                <td>{{ application.get_course_name_display }}</td>
+                <td>{{ application.desired_start_date|date:"d.m.Y" }}</td>
+                <td>
+                    {% if application.payment_method == 'cash' %}
+                        Наличными
+                    {% else %}
+                        Перевод по номеру телефона
+                    {% endif %}
+                </td>
+                <td>
+                    {% if application.status.name == 'Новая' %}
+                        <span class="status-new">{{ application.status.name }}</span>
+                    {% elif application.status.name == 'Идет обучение' %}
+                        <span class="status-in-progress">{{ application.status.name }}</span>
+                    {% else %}
+                        <span class="status-completed">{{ application.status.name }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" style="display: flex; gap: 8px; align-items: center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="application_id" value="{{ application.id }}">
+                        <select name="new_status" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                            {% for status in statuses %}
+                                <option value="{{ status.name }}" {% if application.status.name == status.name %}selected{% endif %}>
+                                    {{ status.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" style="background: #667eea; padding: 6px 14px; border: none; border-radius: 8px; color: white; cursor: pointer;">Изменить</button>
+                    </form>
+                </td>
+                <td>{{ application.created_at|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 40px;">Нет заявок</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    {% if applications.has_previous %}
+        <a href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&laquo; Первая</a>
+        <a href="?page={{ applications.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">&lsaquo; Предыдущая</a>
+    {% endif %}
+
+    <span class="current">
+        Страница {{ applications.number }} из {{ applications.paginator.num_pages }}
+    </span>
+
+    {% if applications.has_next %}
+        <a href="?page={{ applications.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Следующая &rsaquo;</a>
+        <a href="?page={{ applications.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Последняя &raquo;</a>
+    {% endif %}
+</div>
+
+<div style="margin-top: 30px;">
+    <a href="{% url 'applications_list' %}" style="color: #667eea;">Назад к моим заявкам</a>
+</div>
+{% endblock %}
